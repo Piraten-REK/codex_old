@@ -62,5 +62,8 @@
     "@types/jsonwebtoken": "^8.5.4",
     "@types/mysql": "^2.15.19",
     "nodemon": "^2.0.12"
+  },
+  "ts-standard": {
+    "project": "./tsconfig.json"
   }
 }
