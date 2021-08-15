@@ -32,6 +32,48 @@ class Database {
     ))
   }
 
+  async select <T> (table: string, where: Record<string, any>, joiner: 'OR'|'AND' = 'OR', fields?: string[]): Promise<{ data: T }> {
+    return await new Promise((resolve, reject) => this.db.query(
+      `SELECT ${fields != null ? fields.map(() => '??').join(', ') : '*'} FROM ?? WHERE ${Object.keys(where).map(() => '?? = ?').join(` ${joiner} `)}`,
+      fields != null ? [fields, table, ...Object.entries(where).flat()] : [table, ...Object.entries(where).flat()],
+      (error, results) => {
+        if (error != null) reject(error)
+        else {
+          resolve({
+            data: results[0] ?? null
+          })
+        }
+      }
+    ))
+  }
+
+  async insert <T> (table: string, fields: Record<string, any>, id: string = 'id'): Promise<{ insertId: number, data: T }> {
+    const results: { insertId: number } = await new Promise((resolve, reject) => this.db.query(
+      `INSERT INTO ?? (${Object.keys(fields).map(() => '??').join(', ')}) VALUES(${Object.keys(fields).map(() => '?').join(', ')})`,
+      [table, ...Object.keys(fields), ...Object.values(fields)],
+      (error, results: { insertId: number }) => {
+        if (error != null) reject(error)
+        else resolve(results)
+      }
+    ))
+    const data = await this.select<T>(table, Object.fromEntries([[id, id in fields ? fields[id] : results.insertId]]))
+    return {
+      ...data,
+      insertId: id in fields ? fields[id] : results.insertId
+    }
+  }
+
+  async delete (table: string, where: Record<string, any>, joiner: 'OR'|'AND' = 'OR'): Promise<{ deleted: number }> {
+    return await new Promise((resolve, reject) => this.db.query(
+      `DELETE FROM ?? WHERE ${Object.keys(where).map(() => '?? = ?').join(` ${joiner} `)}`,
+      [table, ...Object.entries(where).flat()],
+      (error, results: { changedRows: number }) => {
+        if (error != null) reject(error)
+        else resolve({ deleted: results.changedRows })
+      }
+    ))
+  }
+
   stop (): void {
     this.db.end()
   }

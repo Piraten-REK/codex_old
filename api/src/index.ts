@@ -1,13 +1,42 @@
 import express, { Request, Response, NextFunction } from 'express'
 import routes from './routes'
-import { badRequest } from './errors'
+import { badRequest, internal } from './errors'
+import jwt from 'jsonwebtoken'
+import { config as dotenv } from 'dotenv'
+import { resolve as path } from 'path'
+import DbTypes from './dbTypes'
+import db from './db'
+
+dotenv({ path: path(__dirname, '../env') })
 
 const app = express()
 const port = 3000
 
-app.use((_, res, next) => {
+app.use((req, res, next) => {
   res.header('Content-Type', 'application/json;charset=utf-8')
-  next()
+
+  const authHeader = req.header('Authorization')
+  if (authHeader != null && /^\s*Bearer/.test(authHeader)) {
+    const token = authHeader.match(/^\s*Bearer\s*([\w.-]+)/)?.[1] ?? ''
+    const tokenSecret = process.env.TOKEN_SECRET
+
+    if (tokenSecret == null) return internal(res, 'TOKEN_SECRET not provided')
+
+    jwt.verify(token, tokenSecret, (err, data) => {
+      if (err != null || data == null) {
+        // @ts-expect-error
+        req.user = null
+        next()
+      } else {
+        db.select<DbTypes.Tables.User>('user', { id: data.sub }) // eslint-disable-line @typescript-eslint/no-floating-promises
+          .then(({ data: user }) => {
+            // @ts-expect-error
+            req.user = user
+            next()
+          })
+      }
+    })
+  }
 })
 
 app.use(express.json())

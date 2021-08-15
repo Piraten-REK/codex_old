@@ -335,11 +335,3 @@ CREATE TABLE single_resolution_history (
     FOREIGN KEY (editor) REFERENCES `user`(id) ON DELETE RESTRICT,
     FOREIGN KEY (resolution_id) REFERENCES single_resolution(id)
 );
-
-CREATE TABLE session (
-    token               VARCHAR(256)        NOT NULL PRIMARY KEY,
-    expires             DATETIME            NOT NULL,
-    user_id             BIGINT UNSIGNED     NOT NULL,
-
-    FOREIGN KEY (user_id) REFERENCES `user`(id)
-);
