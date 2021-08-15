@@ -112,10 +112,11 @@ CREATE TABLE application (
 
 CREATE TABLE application_history (
     id                      BIGINT UNSIGNED     NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    appication_id             BIGINT UNSIGNED     NOT NULL,
+    appication_id           BIGINT UNSIGNED     NOT NULL,
     editor                  BIGINT UNSIGNED     NOT NULL,
-    `timestamp`             DATETIME            NOT NULL DEFAULT CURDATE(),
+    `timestamp`             DATETIME            NOT NULL DEFAULT CURTIME(),
     changes                 TEXT                NOT NULL,
+
 
     FOREIGN KEY (editor) REFERENCES `user`(id) ON DELETE RESTRICT,
     FOREIGN KEY (appication_id) REFERENCES application(id)
