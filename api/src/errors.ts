@@ -18,3 +18,5 @@ export const notFound = (res: Response, reason: string|Request) => error(
     404,
     'Not Found'
 )
+
+export const internal = (res: Response, reason: string = 'Whooops … Something went wrong') => error(res, reason, 500, 'Internal Server Error')

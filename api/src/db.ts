@@ -17,6 +17,19 @@ class Database {
         this.db.connect()
     }
 
+    async selectAll <T> (table: string, fields?: string[]): Promise<{ data: T[] }> {
+        return new Promise((resolve, reject) => this.db.query(
+            fields ? 'SELECT ?? FROM ??' : 'SELECT * FROM ??',
+            fields ? [fields, table] : [table],
+            (error, results) => {
+                if (error) reject(error)
+                else resolve({
+                    data: results as T[]
+                })
+            }
+        ))
+    }
+
     stop () {
         this.db.end()
     }
