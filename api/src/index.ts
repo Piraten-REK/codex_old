@@ -4,7 +4,7 @@ import { badRequest, internal } from './errors'
 import jwt from 'jsonwebtoken'
 import { config as dotenv } from 'dotenv'
 import { resolve as path } from 'path'
-import DbTypes from './dbTypes'
+import { Database } from './types'
 import db from './db'
 
 dotenv({ path: path(__dirname, '../env') })
@@ -28,7 +28,7 @@ app.use((req, res, next) => {
         req.user = null
         next()
       } else {
-        db.select<DbTypes.Tables.User>('user', { id: data.sub }) // eslint-disable-line @typescript-eslint/no-floating-promises
+        db.select<Database.User>('user', { id: data.sub }) // eslint-disable-line @typescript-eslint/no-floating-promises
           .then(({ data: user }) => {
             // @ts-expect-error
             req.user = user
@@ -36,6 +36,8 @@ app.use((req, res, next) => {
           })
       }
     })
+  } else {
+    next()
   }
 })
 

@@ -1,7 +1,7 @@
 import express from 'express'
 import * as errors from '../errors'
 import db from '../db'
-import DbTypes from '../dbTypes'
+import { Database, API } from '../types'
 import Joi from '@hapi/joi'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
@@ -14,18 +14,26 @@ dotenv({ path: path(__dirname, '../../.env') })
 const router = express.Router()
 
 route(router, '/', {
-  get: (_, res) => {
-    db.selectAll<DbTypes.Tables.User>('user')
-      .then(({ data }) => res.json(data.map(user => {
-        return {
-          username: user.username,
-          displayName: user.display_name,
-          email: user.email,
-          bio: user.bio,
-          avatar: user.avatar,
-          gender: user.gender
-        }
-      })))
+  get: (req, res) => {
+    db.selectAll<Database.User>('user')
+      .then(({ data }) => {
+        res.json(data.map(user => {
+          const obj: API.User = {
+            username: user.username,
+            displayName: user.display_name,
+            email: user.email,
+            bio: user.bio,
+            avatar: user.avatar !== null ? `/users/${user.id}/avatar` : null,
+            gender: user.gender
+          }
+          // @ts-expect-error
+          if ((req.user as Database.User | undefined)?.is_admin === 1) {
+            obj.isActive = user.is_active
+            obj.isAdmin = user.is_admin
+          }
+          return obj
+        }))
+      })
       .catch((e: Error) => errors.internal(res, e.message))
   }
 })
@@ -42,7 +50,7 @@ route(router, '/login', {
 
     if (error != null) return errors.badRequest(res, error)
 
-    db.select<DbTypes.Tables.User>('user', { username: req.body.user, email: req.body.user })
+    db.select<Database.User>('user', { username: req.body.user, email: req.body.user })
       .then(({ data: user }) => {
         if (user === null) return errors.notFound(res, 'User could not be found')
         if (!bcrypt.compareSync(req.body.password, user.password)) return errors.unauthorized(res, 'Password mismatch')
