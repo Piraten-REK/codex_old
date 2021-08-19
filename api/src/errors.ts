@@ -10,7 +10,9 @@ export const error = (res: Response, reason: string, status: number, msg: string
 
 export const badRequest = (res: Response, reason: string): void => error(res, reason, 400, 'Bad Request')
 
-export const unauthorized = (res: Response, reason: string): void => error(res, reason, 401, 'Unauthorized')
+export const unauthorized = (res: Response, reason: string = 'User not logged in'): void => error(res, reason, 401, 'Unauthorized')
+
+export const forbidden = (res: Response, reason: string = 'Unsufficient privileges'): void => error(res, reason, 403, 'Forbidden')
 
 export const notFound = (res: Response, reason: string|Request): void => error(
   res,
