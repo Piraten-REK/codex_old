@@ -28,12 +28,13 @@ app.use((req, res, next) => {
         req.user = null
         next()
       } else {
-        db.select<Database.User>('user', { id: data.sub }) // eslint-disable-line @typescript-eslint/no-floating-promises
+        db.select<Database.User>('user', { id: data.sub })
           .then(({ data: user }) => {
             // @ts-expect-error
             req.user = user
             next()
           })
+          .catch(e => internal(res, e.message))
       }
     })
   } else {
