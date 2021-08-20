@@ -63,7 +63,7 @@ route(router, '/login', {
         if (user === null) return errors.notFound(res, 'User could not be found')
         if (!bcrypt.compareSync(req.body.password, user.password)) return errors.unauthorized(res, 'Password mismatch')
 
-        const expires = new Date().getTime() + (req.body.stayLoggedIn === true ? 90 * 24 * 60 * 60 * 1000 : 5 * 60 * 60 * 1000)
+        const expires = (req.body.stayLoggedIn === true ? 90 * 24 : 5) * 60 * 60
         const session = jwt.sign(
           { sub: user.id },
           (process.env as NodeJS.ProcessEnv & { TOKEN_SECRET: string }).TOKEN_SECRET,
