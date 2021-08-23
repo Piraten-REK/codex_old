@@ -19,6 +19,21 @@ export declare namespace Database {
     uploader: number
   }
 
+  interface UserWithAvatar {
+    id: number
+    username: string
+    display_name: string
+    email: string
+    password: string
+    bio: string | null
+    avatar_id: number
+    avatar_filename: string
+    avatar_ctime: Date
+    gender: 'f' | 'm' | 'a'
+    is_active: MySQLBool
+    is_admin: MySQLBool
+  }
+
   interface Committee {
     id: number
     start: Date

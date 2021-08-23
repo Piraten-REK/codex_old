@@ -38,6 +38,9 @@ ALTER TABLE `user`
     ADD CONSTRAINT
     FOREIGN KEY (avatar) REFERENCES `file`(id) ON DELETE SET NULL;
 
+CREATE VIEW user_with_avatar (id, username, display_name, email, password, bio, avatar_id, avatar_filename, avatar_ctime, gender, is_active, is_admin) AS
+    SELECT u.id, u.username, u.display_name, u.email, u.password, u.bio, f.id, f.filename, f.created, u.gender, u.is_active, u.is_admin FROM user u LEFT JOIN file f ON f.id = u.avatar;
+
 CREATE TABLE committee (
     `period`            INT UNSIGNED        NOT NULL PRIMARY KEY AUTO_INCREMENT,
     start               DATE                NOT NULL,

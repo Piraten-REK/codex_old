@@ -47,6 +47,17 @@ class Database {
     ))
   }
 
+  async exists (table: string, where: Record<string, any>, joiner: 'OR'|'AND' = 'OR'): Promise<boolean> {
+    return await new Promise((resolve, reject) => this.db.query(
+      `SELECT COUNT(*) AS exists FROM ?? WHERE ${Object.keys(where).map(() => '?? = ?').join(` ${joiner} `)}`,
+      [table, ...Object.entries(where).flat()],
+      (error, results) => {
+        if (error != null) reject(error)
+        else resolve(results[0].exists > 0)
+      }
+    ))
+  }
+
   async insert <T> (table: string, fields: Record<string, any>, id: string = 'id'): Promise<{ insertId: number, data: T }> {
     const results: { insertId: number } = await new Promise((resolve, reject) => this.db.query(
       `INSERT INTO ?? (${Object.keys(fields).map(() => '??').join(', ')}) VALUES(${Object.keys(fields).map(() => '?').join(', ')})`,
