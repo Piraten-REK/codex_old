@@ -4,8 +4,7 @@ import { badRequest, internal } from './errors'
 import jwt from 'jsonwebtoken'
 import { config as dotenv } from 'dotenv'
 import { resolve as path } from 'path'
-import { Database } from './types'
-import db from './db'
+import User from './types/User'
 
 dotenv({ path: path(__dirname, '../env') })
 
@@ -28,13 +27,17 @@ app.use((req, res, next) => {
         req.user = null
         next()
       } else {
-        db.select<Database.User>('user', { id: data.sub })
-          .then(({ data: user }) => {
+        User.getById(parseInt(data.sub as string))
+          .then(user => {
             // @ts-expect-error
             req.user = user
             next()
           })
-          .catch(e => internal(res, e.message))
+          .catch(e => {
+            console.warn('Unable to parse JWT')
+            console.warn(e instanceof Error ? e.message : e)
+            next()
+          })
       }
     })
   } else {

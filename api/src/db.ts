@@ -74,6 +74,22 @@ class Database {
     }
   }
 
+  async update <T> (table: string, fields: Record<string, any>, where: any, id: string = 'id'): Promise<{ updated: number, data: T }> {
+    const results: { changedRows: number } = await new Promise((resolve, reject) => this.db.query(
+      `UPDATE ?? SET ${Object.keys(fields).map(() => '?? = ?').join(', ')} WHERE ?? = ??`,
+      [table, ...Object.entries(fields).flat(), id, where],
+      (error, results: { changedRows: number }) => {
+        if (error != null) reject(error)
+        else resolve(results)
+      }
+    ))
+    const data = await this.select<T>(table, Object.fromEntries([[id, id in fields ? fields[id] : where]]))
+    return {
+      ...data,
+      updated: results.changedRows
+    }
+  }
+
   async delete (table: string, where: Record<string, any>, joiner: 'OR'|'AND' = 'OR'): Promise<{ deleted: number }> {
     return await new Promise((resolve, reject) => this.db.query(
       `DELETE FROM ?? WHERE ${Object.keys(where).map(() => '?? = ?').join(` ${joiner} `)}`,

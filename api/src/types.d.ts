@@ -7,7 +7,7 @@ export declare namespace Database {
     password: string
     bio: string | null
     avatar: number | null
-    gender: 'f' | 'm' | 'a'
+    gender: Gender
     is_active: MySQLBool
     is_admin: MySQLBool
   }
@@ -26,10 +26,28 @@ export declare namespace Database {
     email: string
     password: string
     bio: string | null
-    avatar_id: number
-    avatar_filename: string
-    avatar_ctime: Date
-    gender: 'f' | 'm' | 'a'
+    avatar_id: number | null
+    avatar_filename: string | null
+    avatar_ctime: Date | null
+    gender: Gender
+    is_active: MySQLBool
+    is_admin: MySQLBool
+  }
+
+  interface FileWithUploader {
+    id: number
+    filename: string
+    created: Date
+    uploader_id: number
+    username: string
+    display_name: string
+    email: string
+    password: string
+    bio: string|null
+    avatar_id: number|null
+    avatar_filename: string|null
+    avatar_ctime: Date|null
+    gender: Gender
     is_active: MySQLBool
     is_admin: MySQLBool
   }
@@ -138,15 +156,17 @@ export declare namespace Database {
 
 type MySQLBool = 0 | 1
 
+type Gender = 'f' | 'm' | 'a'
+
 export declare namespace API {
   interface User {
     id?: number
     username: string
     displayName: string
     email: string
-    bio: string | null
-    avatar: string | null
-    gender: 'f' | 'm' | 'a'
+    bio?: string
+    avatar?: string
+    gender: Gender
     isActive?: bool
     isAdmin?: bool
   }
