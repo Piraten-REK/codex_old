@@ -74,7 +74,7 @@ route(router, '/login', {
     User.getByUsernameOrEmail(req.body.user)
       .then(user => {
         if (user === null) return errors.notFound(res, 'User could not be found')
-        if (user.checkPassword(req.body.password)) return errors.unauthorized(res, 'Password mismatch')
+        if (!user.checkPassword(req.body.password)) return errors.unauthorized(res, 'Password mismatch')
 
         const expires = (req.body.stayLoggedIn === true ? 90 * 24 : 5) * 60 * 60
         const session = jwt.sign(
@@ -145,4 +145,15 @@ route(router, '/:id/avatar', {
   delete: (_, res) => errors.error(res, 'Worl in Progress', 501, 'Not Implemented')
 })
 
+route(router, '/:id/updatePassword', {
+  post: (_, res) => errors.error(res, 'Work in Progress', 501, 'Not Implemented')
+})
+
+route(router, '/:id/setActive', { post: (_, res) => errors.error(res, 'Work in Progress', 501, 'Not Implemented') })
+route(router, '/:id/setInactive', { post: (_, res) => errors.error(res, 'Work in Progress', 501, 'Not Implemented') })
+
+route(router, '/:id/setAdmin', { post: (_, res) => errors.error(res, 'Work in Progress', 501, 'Not Implemented') })
+route(router, '/:id/unsetAdmin', { post: (_, res) => errors.error(res, 'Work in Progress', 501, 'Not Implemented') })
+
+route(router, '/forgotPassword', { post: (_, res) => errors.error(res, 'Work in Progress', 501, 'Not Implemented') })
 export default router

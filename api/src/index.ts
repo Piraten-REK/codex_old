@@ -41,6 +41,8 @@ app.use((req, res, next) => {
       }
     })
   } else {
+    // @ts-expect-error
+    req.user = null
     next()
   }
 })
