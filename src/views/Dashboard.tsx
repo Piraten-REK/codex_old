@@ -1,9 +1,12 @@
-import React from 'react'
+import { DefaultRootState, useSelector } from 'react-redux'
 
 const Dashboard = (): JSX.Element => {
+  const session = useSelector((state: DefaultRootState & { session: string|null }) => state.session)
+
   return (
     <div>
-      Dashboard
+      <p>Dashboard</p>
+      <pre>SESSION: {session}</pre>
     </div>
   )
 }
